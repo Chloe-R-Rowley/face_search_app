@@ -1,0 +1,23 @@
+// main.dart
+
+import 'package:flutter/material.dart';
+import 'package:face_search_app/face_search_screen.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Face Search App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const FaceSearchApp(),
+    );
+  }
+}
