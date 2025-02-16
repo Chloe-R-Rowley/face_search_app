@@ -27,11 +27,21 @@ class _FaceSearchAppState extends State<FaceSearchApp> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
-      setState(() {
-        _currentImageIndex = (_currentImageIndex + 1) % _relatedImageUrls.length;
+    _startImageRotation();
+  }
+
+  void _startImageRotation() {
+    if (_relatedImageUrls.isNotEmpty) {
+      _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+        if (_relatedImageUrls.isNotEmpty) {
+          setState(() {
+            _currentImageIndex = (_currentImageIndex + 1) % _relatedImageUrls.length;
+          });
+        } else {
+          _timer.cancel();
+        }
       });
-    });
+    }
   }
 
   @override
@@ -40,53 +50,29 @@ class _FaceSearchAppState extends State<FaceSearchApp> {
     super.dispose();
   }
 
-  void _startImageRotation() {
-    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
-      setState(() {
-        _currentImageIndex = (_currentImageIndex + 1) % _relatedImageUrls.length;
-      });
-    });
-  }
-
   Future<void> _sendImageToBackend(File imageFile) async {
-    final url = Uri.parse('http://10.0.2.2:3000/process-image'); // Dummy API endpoint
+    List<String> sampleImages = [
+      'assets/images/srk1.jpg',
+      'assets/images/srk2.jpg',
+      'assets/images/srk3.jpg',
+      'assets/images/srk4.jpg'
+    ]; // Dummy sample images
 
-    try {
-      setState(() {
-        _loading = true;
-        _errorMessage = '';
-      });
+    setState(() {
+      _loading = true;
+      _errorMessage = '';
+    });
 
-      final response = await http.post(
-        url,
-        body: {
-          'imageData': imageFile.readAsBytesSync().toString(),
-        },
-      );
+    // Simulate a delay of 3 seconds before displaying images
+    await Future.delayed(const Duration(seconds: 3));
 
-      if (response.statusCode == 200) {
-        final responseBody = json.decode(response.body);
-        final List<String> relatedImageUrls = List<String>.from(responseBody['relatedImages']);
+    setState(() {
+      _relatedImageUrls = sampleImages; // Assign dummy images
+      _loading = false;
+      _currentImageIndex = 0;
+    });
 
-        setState(() {
-          _relatedImageUrls = relatedImageUrls;
-          _loading = false;
-          _currentImageIndex = 0;
-        });
-
-        _startImageRotation(); // Start rotating through related images
-      } else {
-        setState(() {
-          _errorMessage = 'Failed to fetch related images. Please try again later.';
-          _loading = false;
-        });
-      }
-    } catch (error) {
-      setState(() {
-        _errorMessage = 'An unexpected error occurred: $error';
-        _loading = false;
-      });
-    }
+    _startImageRotation(); // Start rotating through images
   }
 
   Future<void> _getImage() async {
@@ -167,12 +153,23 @@ class _FaceSearchAppState extends State<FaceSearchApp> {
                   _errorMessage,
                   style: const TextStyle(color: Colors.red),
                 ),
-              if (_relatedImageUrls.isNotEmpty)
-                CachedNetworkImage(
-                  imageUrl: _relatedImageUrls[_currentImageIndex],
-                  placeholder: (context, url) => const CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                ),
+             if (_relatedImageUrls.isNotEmpty)
+              Column(
+                children: [
+                  const SizedBox(height: 10),
+                  _relatedImageUrls[_currentImageIndex].startsWith('http') // Check if it's a network image
+                      ? CachedNetworkImage(
+                          imageUrl: _relatedImageUrls[_currentImageIndex],
+                          placeholder: (context, url) => const CircularProgressIndicator(),
+                          errorWidget: (context, url, error) => const Icon(Icons.error),
+                        )
+                      : Image.asset( // Use Image.asset for local images
+                          _relatedImageUrls[_currentImageIndex],
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+                        ),
+                ],
+              ),
             ],
           ),
         ),
