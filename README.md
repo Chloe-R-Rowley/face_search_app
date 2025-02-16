@@ -1,16 +1,13 @@
 # face_search_app
 
-A new Flutter project.
+Here are the screenshots:
 
-## Getting Started
+![alt text](screen.png) ![alt text](popup.png)
 
-This project is a starting point for a Flutter application.
+![alt text](image_search.png)
 
-A few resources to get you started if this is your first Flutter project:
+Here is the demo of the app:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+[Watch the video](video.mp4)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+(You have to download the video to watch it)
